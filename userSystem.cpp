@@ -29,9 +29,10 @@ private:
 
 	void registerUser()
 	{
+		MongoDb db = MongoDB::getInstance();
 		std::string fname, lname, username, password, role;
-		getUserDetails(fname, lname, username, password, role);
-		// not complete
+		std::unique_ptr<User> user = getUserDetails(fname, lname, username, password, role);
+		db.insertUser(user);
 	}
 
 	bool checkPassword(std::string pwd)
@@ -74,7 +75,7 @@ private:
 		return true;
 	}
 
-	void getUserDetails(std::string fname, std::string lname, std::string username, std::string password, std::string role)
+	std::unique_ptr<User> getUserDetails(std::string fname, std::string lname, std::string username, std::string password, std::string role)
 	{
 		do
 		{
@@ -96,6 +97,7 @@ private:
 			password = getPassword();
 		}while(!checkPassword(password));
 
+		
 	}
 };
 

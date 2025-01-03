@@ -1,5 +1,6 @@
 #include <string>
 #include "user.cpp"
+// #include "mongodb.cpp"
 
 class Customer : public User
 {
@@ -51,7 +52,9 @@ public:
 private:
 	void availableFoodList()
 	{
+		MongoDB* db = MongoDB::getInstance();
 
+		db->foodMenu(); // this is for printing food in data base(name & quantity)
 	}
 
 	void orderBySeller()

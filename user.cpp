@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include <iomanip>
+#include <openssl/md5.h>
 #include <unistd.h> //for sleep
 
 class User
@@ -36,8 +38,32 @@ public:
 protected:
 	virtual void displayMenu() = 0;
 	virtual void menuAction() = 0;
-	std::string hashPassword(const std::string& password);
-	std::string generateUsername();
+	std::string hashPassword(const std::string& password)
+	{
+		unsigned char digest[MD5_DIGEST_LENGTH];
+		MD5(reinterpret_cast<const unsigned char*>(password.c_str()), password.size(), digest);
+
+		std::ostringstream os;
+		for(int i = 0; i < MD5_DIGEST_LENGTH; ++i)
+		{
+			os << std::hex << std::setw(2) << std::setfill('0') << (int)digest[i];
+		}
+		return os.str();
+	}
+
+	std::string generateUsername()
+	{
+		MongoDB db = MongoDB::getInstance();
+		std::string base = firstName.substr(0,3) + lastName.substr(0,3);
+
+		std::string unique = base;
+
+		while(db.findUser(base))
+		{
+			unique = base + std::to_string(std::rand());
+		}
+		return unique;
+	}
 	int getCommand()
 	{
 		std::string input;
@@ -62,7 +88,49 @@ protected:
 		}
 		return number;
 	}
+	//getters
+	std::string getFirstName() {return firstName;}
+	std::string getLastName() {return lastName;}
+	std::string getPasswordHash() {return passwordHash;}
+	std::string getUsername() {return username;}
+	std::string getRole() {return role;}
+	double getWallet() {return wallet;}
 
 };
 
+class Food {
+public:
+    std::string name;
+	std::string seller;
+    int quantity;
+    double price;
+
+    Food(std::string n, std::string seller, double p) : name(n), price(p), seller(seller) {}
+	Food(std::string n, double p) : name(n), price(p) {}
+
+	void showFood()
+	{
+		std::cout << name << " -> " << price;
+	}
+private:
+	std::string getName() {return name;}
+	std::string getSeller() {return seller;}
+	int getQuantity() {return quantity;}
+	double getPrice() {return price;}
+};
+
+class Order
+{
+private:
+	std::string username;
+	Food food;
+	double price;
+
+public:
+	Order(std::string un, Food f, double p) : username(un), food(f), price(p) {}
+
+	std::string getUsername() {return username;}
+	Food getFood() {return food;}
+	double getPrice() {return price;}
+};
 
