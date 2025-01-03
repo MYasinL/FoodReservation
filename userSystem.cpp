@@ -1,4 +1,8 @@
-#include <unorderd_map>
+#include <unordered_map>
+#include <string>
+#include "user.cpp"
+#include <iostream>
+#include <regex>
 
 class UserSystem
 {
@@ -34,16 +38,16 @@ private:
 	{
 		std::cout << "Confirm password: ";
 		std::string pwdconfirm = getPassword();
-		std::string pwdPattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})";
+		std::regex pwdPattern ("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})");
 
-		if(password != pwdconfirm)
+		if(pwd != pwdconfirm)
 		{
 			std::cout << "Password mismatch!\nTry again.\n";
 			return false;
 		}
-		if(!std::regex_match(password, pwdPattern))
+		if(!regex_match(pwd, pwdPattern))
 		{
-			cout << "Invalid Password\n";
+			std::cout << "Invalid Password\n";
 			return false;
 		}
 		return true;
@@ -70,7 +74,7 @@ private:
 		return true;
 	}
 
-	void getUserDetails(fname, lname, username, password, role)
+	void getUserDetails(std::string fname, std::string lname, std::string username, std::string password, std::string role)
 	{
 		do
 		{
@@ -84,13 +88,13 @@ private:
 		{
 			std::cout << "Role: ";
 			std::cin >> role;
-		}while(!isRoleValid())
+		}while(!isRoleValid(role));
 		
 		do
 		{
 			std::cout << "Password: ";
 			password = getPassword();
-		}while(!checkPassword());
+		}while(!checkPassword(password));
 
 	}
 };
