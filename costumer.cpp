@@ -1,6 +1,5 @@
 #include <string>
 #include "user.cpp"
-// #include "mongodb.cpp"
 
 class Customer : public User
 {
@@ -59,12 +58,63 @@ private:
 
 	void orderBySeller()
 	{
+		MongoDB* db = MongoDB::getInstance();
+		std::string seller;
+		std::string foodname;
+		Food buyFood;
+
+		std::cout << "Which seller you want? ";
+		std::cin >> seller;
+
+		std::vector<Food> foods = db->findFoodBySeller(seller);
+		if(foods.empty())
+		{
+			std::cout << "no seller or no food.\n";
+			return;
+		}
+		std::cout << "**Foods by " << seller << " **\n";
+
+		for(Food food : foods)
+		{
+			std::cout << food.getName() << ":  " << food.getPrice();
+		}
+
+		std::cout << "which food do you want: ";
+		std::cin >> foodname;
+
+		for(Food food : foods)
+		{
+			if (food.getName == foodname)
+			{
+				buyFood = food;
+				break;
+			}
+		}
+		if(buyFood == nullptr)
+		{
+			std::cout << "This food is not valid.\n";
+			return;
+		}
+
+		db->orderFood(this, buyFood);
 
 	}
 
 	void orderHistoryList()
 	{
+		MongoDB* db = MongoDB::getInstance();
+		std::vector<Food> orders = db->getCostumerOrder(this.getfirstName + this.getLastName);
+		if(orders.empty())
+		{
+			std::cout << "NO Order!\n";
+			return;
+		}
 
+		std::cout << "**Orders**\n";
+		for(Food food : orders)
+		{
+			std::cout << food.getName() << ":  " << food.getPrice();
+		}
 	}
 
 	void increaseBalance()

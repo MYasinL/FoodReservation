@@ -46,12 +46,32 @@ public:
 private:
     void addFood()
     {
+        MongoDB* db = MongoDB::getInstance();
+        std::string foodname;
+        std::double price;
 
+        std::cout << "Food name: ";
+        std::cin >> foodname;
+        std::cout << "Price: ";
+        std::cin >> price;
+
+        Food food(foodname, this->lastName, price);
+        
+        db->addFoodMenu(food);
     }
 
     void soldFoodList()
     {
+        MongoDB* db = MongoDB::getInstance();
+        std::vector<Food> foods = db->getSoldFood(this->lastName);
+        std::cout << "**Sold Foods**\n";
 
+        for(Food food : foods)
+        {
+            std::cout << food.getName() << ":  " << food.getPrice() << "\n";
+        }
+
+        
     }
 
     void viewBalance()

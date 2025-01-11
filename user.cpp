@@ -3,6 +3,9 @@
 #include <iomanip>
 #include <openssl/md5.h>
 #include <unistd.h> //for sleep
+#include "mongodb.cpp"
+
+// class MongoDB;
 
 class User
 {
@@ -13,6 +16,7 @@ protected:
 	std::string username;
 	std::string role; //"customer" or "seller"
 	double wallet;
+
 public:
 	User(std::string firstName, std::string lastName, std::string password): firstName(firstName), lastName(lastName), wallet(0.0)
 	{
@@ -122,15 +126,13 @@ private:
 class Order
 {
 private:
-	std::string username;
+	std::string costumer;
 	Food food;
-	double price;
 
 public:
-	Order(std::string un, Food f, double p) : username(un), food(f), price(p) {}
+	Order(std::string un, Food f) : costumer(un), food(f) {}
 
-	std::string getUsername() {return username;}
+	std::string getCostumer() {return costumer;}
 	Food getFood() {return food;}
-	double getPrice() {return price;}
 };
 
