@@ -1,4 +1,4 @@
-#include "user.cpp"
+#include "user.h"
 
 class Seller : public User 
 {

@@ -5,7 +5,7 @@
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/json.hpp>
 #include <iostream>
-#include "user.cpp"
+#include "user.h"
 
 
 class MongoDB

@@ -1,5 +1,5 @@
 #include <string>
-#include "user.cpp"
+#include "user.h"
 
 class Customer : public User
 {
