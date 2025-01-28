@@ -3,7 +3,7 @@
 #include <iomanip>
 #include <openssl/md5.h>
 #include <unistd.h> //for sleep
-#include "mongodb.cpp"
+#include "mongodb.h"
 
 // class MongoDB;
 
