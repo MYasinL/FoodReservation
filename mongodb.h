@@ -16,7 +16,7 @@ private:
 public:
     static MongoDB* getInstance();
     void insertUser(const User user);
-    bool validateUser(const std::string& username, const std::string& passwordHash);
+    User validateUser(const std::string& username, const std::string& passwordHash);
     bool findUser(const std::string& username);
     void addFoodMenu(const Food food);
     void foodMenu();

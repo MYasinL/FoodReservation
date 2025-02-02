@@ -18,11 +18,16 @@ protected:
 	double wallet;
 
 public:
-	User(std::string firstName, std::string lastName, std::string password): firstName(firstName), lastName(lastName), wallet(0.0)
+	User(std::string firstName, std::string lastName, std::string password)
+	: firstName(firstName), lastName(lastName), wallet(0.0)
 	{
 		passwordHash = hashPassword(password);
 		username = generateUsername();
 	}
+
+	User(std::string firstName, std::string lastName, std::string role, double wallet, std::string username)
+	: firstName(firstName), lastName(lastName), role(role), wallet(wallet), username(username)
+	{}
 
 	virtual void viewProfile()
 	{
@@ -42,7 +47,7 @@ public:
 protected:
 	virtual void displayMenu() = 0;
 	virtual void menuAction() = 0;
-	std::string hashPassword(const std::string& password)
+	static std::string hashPassword(const std::string& password)
 	{
 		unsigned char digest[MD5_DIGEST_LENGTH];
 		MD5(reinterpret_cast<const unsigned char*>(password.c_str()), password.size(), digest);

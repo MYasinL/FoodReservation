@@ -1,21 +1,21 @@
 #include "mongodb.h"
 
-private:
-static MongoDB* instance;
-mongocxx::client client;
-MongoDB()
+MongoDB::MongoDB()
 {
     mongocxx::instance instance{};
-    client : mongocxx::client{mongocxx::uri{}};
+    client = mongocxx::client{mongocxx::uri{}};
 }
 
-static MongoDB::MongoDB* getInstance() {
+static MongoDB* MongoDB::getInstance() {
     if (!instance) {
         instance = new MongoDB();
     }
     return instance;
 }
-
+/**
+ * Add new user(costumer or seller) to the database[users]
+ * @param user the user you want to add.
+ */
 void MongoDB::insertUser(const User user)
 {
     auto db = client["food_order_system"];
@@ -34,16 +34,25 @@ void MongoDB::insertUser(const User user)
 }
 
 // Validate user for the entery by username and password
-bool MongoDB::validateUser(const std::string& username, const std::string& passwordHash)
+User MongoDB::validateUser(const std::string& username, const std::string& passwordHash)
 {
     auto db = client["food_order_system"];
     auto collection = db["users"];
 
     bsoncxx::builder::stream::document filter_builder{};
-    filter_builder << "username" << username << "passwordHash" << passwordHash << bsoncxx::builder::stream::finalize;
+    filter_builder << "username" << username 
+                    << "passwordHash" << passwordHash 
+                    << bsoncxx::builder::stream::finalize;
 
     auto result = collection.find_one(filter_builder.view());
-    return result.has_value();
+    
+    std::string fname = result["firstname"].get_utf8().value.to_string();
+    std::string lname = result["lastname"].get_utf8().value.to_string();
+    std::string role = result["role"].get_utf8().value.to_string();
+    std::string username = result["username"].get_utf8().value.to_string();
+    double wallet = result["wallet"].get_double();
+
+    return User(fname, lname, role, wallet, username);
 }   
 
 /**
@@ -59,9 +68,9 @@ bool MongoDB::findUser(const std::string& username)
     bsoncxx::builder::stream::document filter;
     filter << "username" << username << bsoncxx::builder::stream::finalize;
 
-    auto result = collection.find_one(filter_builder.view());
+    auto result = collection.find_one(filter.view());
     return result.has_value();
-
+}
 
 /**
  * This is for adding food to the food menu by seller.
