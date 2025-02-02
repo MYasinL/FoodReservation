@@ -29,10 +29,31 @@ private:
 
 	void registerUser()
 	{
-		MongoDb db = MongoDB::getInstance();
+		MongoDB db = MongoDB::getInstance();
 		std::string fname, lname, username, password, role;
 		std::unique_ptr<User> user = getUserDetails(fname, lname, username, password, role);
 		db.insertUser(user);
+	}
+
+	void signupUser()
+	{
+		MongoDB db = MongoDB::getInstance();
+		std::string username, password;
+
+		std::cout << "Enter username: ";
+		std::cin >> username;
+
+		std::cout << "Enter PassWord: ";
+		std::cin << getPassword();
+
+		if(db.validateUser(username, User::hashPassword(password)) == nullptr)
+		{
+			std::cout << "User is not valid!\n";
+		}
+		else
+		{
+			
+		}
 	}
 
 	bool checkPassword(std::string pwd)
@@ -97,7 +118,15 @@ private:
 			password = getPassword();
 		}while(!checkPassword(password));
 
-		
+		if (role == "seller") 
+		{
+        	return std::make_unique<Seller>(fname, lname, password);
+    	} 
+		else 
+		{
+        	return std::make_unique<Customer>(fname, lname, password);
+		}
+    
 	}
 };
 
