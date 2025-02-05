@@ -33,7 +33,10 @@ void MongoDB::insertUser(const User user)
     collection.insert_one(document.view())
 }
 
-// Validate user for the entery by username and password
+/**
+ *Validate user for the entery by username and password
+ * @return the user that is found.
+ */
 User MongoDB::validateUser(const std::string& username, const std::string& passwordHash)
 {
     auto db = client["food_order_system"];
@@ -45,14 +48,22 @@ User MongoDB::validateUser(const std::string& username, const std::string& passw
                     << bsoncxx::builder::stream::finalize;
 
     auto result = collection.find_one(filter_builder.view());
-    
-    std::string fname = result["firstname"].get_utf8().value.to_string();
-    std::string lname = result["lastname"].get_utf8().value.to_string();
-    std::string role = result["role"].get_utf8().value.to_string();
-    std::string username = result["username"].get_utf8().value.to_string();
-    double wallet = result["wallet"].get_double();
+    if(result)
+    {
+        auto doc = result.value();
+        std::string fname = doc["firstname"].get_utf8().value.to_string();
+        std::string lname = doc["lastname"].get_utf8().value.to_string();
+        std::string role = doc["role"].get_utf8().value.to_string();
+        std::string username = doc["username"].get_utf8().value.to_string();
+        double wallet = doc["wallet"].get_double();
 
-    return User(fname, lname, role, wallet, username);
+        return User(fname, lname, role, wallet, username);
+    }
+    else
+    {
+        std::cerr << "User not found!\n";
+        return nullptr;
+    }
 }   
 
 /**

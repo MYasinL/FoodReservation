@@ -8,7 +8,6 @@ class UserSystem
 {
 private:
 	std::unordered_map <std::string, User*> users;
-
 	std::string getPassword()
 	{
 		std::string password;
@@ -35,7 +34,7 @@ private:
 		db.insertUser(user);
 	}
 
-	void signupUser()
+	void signinUser()
 	{
 		MongoDB db = MongoDB::getInstance();
 		std::string username, password;
@@ -43,16 +42,17 @@ private:
 		std::cout << "Enter username: ";
 		std::cin >> username;
 
-		std::cout << "Enter PassWord: ";
-		std::cin << getPassword();
+		std::cout << "Enter Password: ";
+		password = getPassword();
 
-		if(db.validateUser(username, User::hashPassword(password)) == nullptr)
+		User user = db.validateUser(username, User::hashPassword(password));
+		if(user == nullptr)
 		{
 			std::cout << "User is not valid!\n";
 		}
 		else
 		{
-			
+			user.menuAction();
 		}
 	}
 
@@ -126,7 +126,26 @@ private:
 		{
         	return std::make_unique<Customer>(fname, lname, password);
 		}
-    
+	}
+public:
+	static void menu()
+	{
+		std::cout << "1.register\n2.sign in\n";
+		int command;
+		std::cin >> command;
+
+		switch (command)
+		{
+		case  1:
+			registerUser();
+			break;
+		case 2:
+			signinUser();
+			break;
+		default:
+			std::cout << "The command is not valid."
+			break;
+		}
 	}
 };
 
