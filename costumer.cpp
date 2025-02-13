@@ -1,11 +1,14 @@
 #include <string>
 #include "user.h"
 
-class Customer : public User
+class Costumer : public User
 {
 public:
-	Customer(std::string fname, std::string lname, std::string pwd) : User(fname, lname, pwd) {}
+	Costumer(std::string fname, std::string lname, std::string pwd) : User(fname, lname, pwd) {}
 
+	Costumer(std::string fname, std::string lname, std::string username, double wallet, std::string hashPwd) 
+	: User(fname, lname, "costumer", wallet, username, hashPwd){}
+	
 	void displayMenu()
 	{
 		std::cout << "1.Available food menu\n" 
@@ -61,7 +64,7 @@ private:
 		MongoDB* db = MongoDB::getInstance();
 		std::string seller;
 		std::string foodname;
-		Food buyFood;
+		Food buyFood = Food();
 
 		std::cout << "Which seller you want? ";
 		std::cin >> seller;
@@ -84,26 +87,26 @@ private:
 
 		for(Food food : foods)
 		{
-			if (food.getName == foodname)
+			if (food.getName() == foodname)
 			{
 				buyFood = food;
 				break;
 			}
 		}
-		if(buyFood == nullptr)
+		if(buyFood.getName() == "")
 		{
 			std::cout << "This food is not valid.\n";
 			return;
 		}
 
-		db->orderFood(this, buyFood);
+		db->orderFood(*this, buyFood);
 
 	}
 
 	void orderHistoryList()
 	{
 		MongoDB* db = MongoDB::getInstance();
-		std::vector<Food> orders = db->getCostumerOrder(this.getfirstName + this.getLastName);
+		std::vector<Food> orders = db->getCostumerOrder(this->getFirstName() + this->getLastName());
 		if(orders.empty())
 		{
 			std::cout << "NO Order!\n";

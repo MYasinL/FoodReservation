@@ -1,8 +1,10 @@
 #include <unordered_map>
 #include <string>
-#include "user.h"
 #include <iostream>
 #include <regex>
+#include "user.h"
+#include "seller.cpp"
+#include "costumer.cpp"
 
 class UserSystem
 {
@@ -28,15 +30,15 @@ private:
 
 	void registerUser()
 	{
-		MongoDB db = MongoDB::getInstance();
+		MongoDB* db = MongoDB::getInstance();
 		std::string fname, lname, username, password, role;
 		std::unique_ptr<User> user = getUserDetails(fname, lname, username, password, role);
-		db.insertUser(user);
+		db->insertUser(*user);
 	}
 
 	void signinUser()
 	{
-		MongoDB db = MongoDB::getInstance();
+		MongoDB* db = MongoDB::getInstance();
 		std::string username, password;
 
 		std::cout << "Enter username: ";
@@ -45,14 +47,14 @@ private:
 		std::cout << "Enter Password: ";
 		password = getPassword();
 
-		User user = db.validateUser(username, User::hashPassword(password));
+		std::unique_ptr<User> user = db->validateUser(username, User::hashPassword(password));
 		if(user == nullptr)
 		{
 			std::cout << "User is not valid!\n";
 		}
 		else
 		{
-			user.menuAction();
+			user->menuAction();
 		}
 	}
 
@@ -124,12 +126,14 @@ private:
     	} 
 		else 
 		{
-        	return std::make_unique<Customer>(fname, lname, password);
+        	return std::make_unique<Costumer>(fname, lname, password);
 		}
 	}
 public:
 	static void menu()
 	{
+		UserSystem us;
+
 		std::cout << "1.register\n2.sign in\n";
 		int command;
 		std::cin >> command;
@@ -137,13 +141,13 @@ public:
 		switch (command)
 		{
 		case  1:
-			registerUser();
+			us.registerUser();
 			break;
 		case 2:
-			signinUser();
+			us.signinUser();
 			break;
 		default:
-			std::cout << "The command is not valid."
+			std::cout << "The command is not valid.";
 			break;
 		}
 	}

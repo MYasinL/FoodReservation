@@ -16,7 +16,7 @@ static MongoDB* MongoDB::getInstance() {
  * Add new user(costumer or seller) to the database[users]
  * @param user the user you want to add.
  */
-void MongoDB::insertUser(const User user)
+void MongoDB::insertUser(const User& user)
 {
     auto db = client["food_order_system"];
     auto collection = db["users"];
@@ -30,14 +30,14 @@ void MongoDB::insertUser(const User user)
             << "wallet" << 0.0
             << bsoncxx::builder::stream::finalize;
 
-    collection.insert_one(document.view())
+    collection.insert_one(document.view());
 }
 
 /**
  *Validate user for the entery by username and password
  * @return the user that is found.
  */
-User MongoDB::validateUser(const std::string& username, const std::string& passwordHash)
+std::unique_ptr<User> MongoDB::validateUser(const std::string& username, const std::string& passwordHash)
 {
     auto db = client["food_order_system"];
     auto collection = db["users"];
@@ -54,15 +54,23 @@ User MongoDB::validateUser(const std::string& username, const std::string& passw
         std::string fname = doc["firstname"].get_utf8().value.to_string();
         std::string lname = doc["lastname"].get_utf8().value.to_string();
         std::string role = doc["role"].get_utf8().value.to_string();
-        std::string username = doc["username"].get_utf8().value.to_string();
         double wallet = doc["wallet"].get_double();
 
-        return User(fname, lname, role, wallet, username);
+        if(role == "costumer")
+        {
+            return std::make_unique<Costumer>(fname, lname, username, wallet, passwordHash);
+        }
+        else
+        {
+           return std::make_unique<Seller>(fname, lname, username, wallet, passwordHash);
+
+        }
+        
     }
     else
     {
         std::cerr << "User not found!\n";
-        return nullptr;
+        return User();
     }
 }   
 
@@ -87,7 +95,7 @@ bool MongoDB::findUser(const std::string& username)
  * This is for adding food to the food menu by seller.
  * @param food the food that seller wants to add to menu.
  */
-void MongoDB::addFoodMenu(const Food food) 
+void MongoDB::addFoodMenu(const Food& food) 
 {
     auto db = client["food-order-system"];
     auto collection = db["foodMenu"];
@@ -156,7 +164,7 @@ std::vector<Food> MongoDB::findFoodBySeller(const std::string& sellername)
     return foods;
 }
 
-void MongoDB::orderFood(const User user, const Food food)
+void MongoDB::orderFood(const User& user, const Food& food)
 {
     auto db = client["food_order_system"];
     auto collection = db["soldFood"];

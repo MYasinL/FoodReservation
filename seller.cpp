@@ -5,6 +5,9 @@ class Seller : public User
 public:
     Seller(std::string fname, std::string lname, std::string pwd) : User(fname, lname, pwd) {};
 
+    Seller(std::string fname, std::string lname, std::string username, double wallet, std::string hashPwd) 
+	: User(fname, lname, "seller", wallet, username, hashPwd){}
+    
     void displayMenu()
     {
         std::cout << "1.Add food\n"
@@ -48,14 +51,14 @@ private:
     {
         MongoDB* db = MongoDB::getInstance();
         std::string foodname;
-        std::double price;
+        double price;
 
         std::cout << "Food name: ";
         std::cin >> foodname;
         std::cout << "Price: ";
         std::cin >> price;
 
-        Food food(foodname, this->lastName, price);
+        Food food = Food(foodname, this->lastName, price);
         
         db->addFoodMenu(food);
     }

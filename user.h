@@ -1,9 +1,13 @@
+#ifndef USER_H
+#define USER_H
+
 #include <iostream>
 #include <string>
 #include <iomanip>
-// #include <openssl/md5.h>
+#include <openssl/md5.h>
 #include <unistd.h> //for sleep
 #include "mongodb.h"
+#include "food.h"
 
 // class MongoDB;
 
@@ -14,7 +18,7 @@ protected:
 	std::string lastName;
 	std::string passwordHash;
 	std::string username;
-	std::string role; //"customer" or "seller"
+	std::string role; //"costumer" or "seller"
 	double wallet;
 
 public:
@@ -29,24 +33,16 @@ public:
 	: firstName(firstName), lastName(lastName), role(role), wallet(wallet), username(username)
 	{}
 
-	virtual void viewProfile()
-	{
-		std::cout << "Username: " << username << "\n"
-			<< "Name: " << firstName << " " << lastName << "\n"
-			<< "Wallet: " << wallet << "\n";
-	}
-	virtual void editProfile()
-	{
+	User(std::string firstName, std::string lastName, std::string role, double wallet, std::string username, std::string hashPwd)
+	: firstName(firstName), lastName(lastName), role(role), wallet(wallet), username(username), passwordHash(hashPwd)
+	{}
 
-		
-	}
+	User() {}
 
-	std::string getUsername() {return username;}
-	double getBalance() {return wallet;}
-
-protected:
 	virtual void displayMenu() = 0;
 	virtual void menuAction() = 0;
+
+
 	static std::string hashPassword(const std::string& password)
 	{
 		unsigned char digest[MD5_DIGEST_LENGTH];
@@ -60,14 +56,28 @@ protected:
 		return os.str();
 	}
 
+	virtual void viewProfile()
+	{
+		std::cout << "Username: " << username << "\n"
+			<< "Name: " << firstName << " " << lastName << "\n"
+			<< "Wallet: " << wallet << "\n";
+	}
+	virtual void editProfile()
+	{
+
+		
+	}
+
+protected:
+	
 	std::string generateUsername()
 	{
-		MongoDB db = MongoDB::getInstance();
+		MongoDB* db = MongoDB::getInstance();
 		std::string base = firstName.substr(0,3) + lastName.substr(0,3);
 
 		std::string unique = base;
 
-		while(db.findUser(base))
+		while(db->findUser(base))
 		{
 			unique = base + std::to_string(std::rand());
 		}
@@ -107,37 +117,4 @@ protected:
 
 };
 
-class Food {
-public:
-    std::string name;
-	std::string seller;
-    int quantity;
-    double price;
-
-    Food(std::string n, std::string seller, double p) : name(n), price(p), seller(seller) {}
-	Food(std::string n, double p) : name(n), price(p) {}
-
-	void showFood()
-	{
-		std::cout << name << " -> " << price;
-	}
-private:
-	std::string getName() {return name;}
-	std::string getSeller() {return seller;}
-	int getQuantity() {return quantity;}
-	double getPrice() {return price;}
-};
-
-class Order
-{
-private:
-	std::string costumer;
-	Food food;
-
-public:
-	Order(std::string un, Food f) : costumer(un), food(f) {}
-
-	std::string getCostumer() {return costumer;}
-	Food getFood() {return food;}
-};
-
+#endif
